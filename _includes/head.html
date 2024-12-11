@@ -6,6 +6,16 @@
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
     <script type="text/javascript" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="text/javascript">
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$']],  // Enable inline math with $...$
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      };
+    </script>
     <meta charset="utf-8">
     {%- seo -%}
     <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
