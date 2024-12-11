@@ -1,0 +1,153 @@
+---
+layout: post
+title: On the Sparsity of L1 Regularization
+date: 2024-09-30 04:08:20 -0800
+categories: deeplearning
+---
+
+
+Let's define some important terminology / concepts. 
+
+## $L_p$ Norms
+
+An $L_p$ norm is a way to calculate the magnitude of a given mathematical object, say a vector, $\vec{x}$ in $\mathbb{R}^2$.
+
+$$
+\vec{x} = \begin{bmatrix}2 \\ 2\end{bmatrix}
+$$
+
+If I measure its magnitude via the $L_2$ norm, commonly known as the euclidean distance, I get:
+
+$$
+
+\sqrt{2^2 + 2^2} = \sqrt{8} = \text{Norm}_2(\vec{x})
+
+$$
+
+while for the $L_1$ norm, i'd get a simple $3$. 
+<br/>
+More generally, the $L_p$ norm is defined as:
+
+$$
+\text{Norm}_p(\vec{x}) = \sqrt[p]{|x_1|^p + ... + |x_n|^p}
+$$
+<br/>
+
+## Scalar Fields
+<br/>
+They're quite simple, despite their name making the underlying concept sound more intimidating than it needs to be.
+<br/>
+Given a function, $f$, $f$ represents a mathematical function that takes an input in an $n$-dimensional space, $\mathbb{R}^n$, and outputs a value $\in \mathbb{R}$, a simple scalar.
+
+$$
+f: \mathbb{R}^n \rightarrow \mathbb{R}
+$$
+
+As an example, a type of scalar field is the $L_p$ norm, as:
+
+$$
+
+f: \mathbb{R}^n \rightarrow \mathbb{R}, \hspace{3mm} \text{Norm}_p(\vec{x}) = \sqrt[p]{|x_1|^p + ... + |x_n|^p}
+
+$$
+
+where $\text{Norm}_p(\vec{x})$ represents the scalar output of the $L_p$ norm.
+<br/>
+## Isosurfaces and Isolines
+<br/>
+Isolines are curves on a graph, where an arbitrary scalar field $f$, takes on a constant value, $c$, which is called a **level set**. 
+<br/>
+As an example, for a function $f(x, y) \in \mathbb{R}^2$, the isolines can be defined as the set of points, $(x, y)$ where:
+
+$$
+
+f(x, y) = c
+
+$$
+
+You can also think of them as contour lines.
+For the $L_p$ norm, the contour lines are symmetric!
+<br/>
+<div align = 'center'>
+<img src = 'https://www.researchgate.net/publication/356201507/figure/fig4/AS:1104195264495618@1640272074166/Graphical-visualisation-of-different-L-p-norms-L-0-norms-which-is-not-a-norm-by.png'width = '450px'></img>
+</div>
+<br/>
+
+For spaces $\mathbb{R}^n$ where $n = 3$, the isolines turn into isosurfaces, where we have a $3$ dimensional shape. 
+
+<br/>
+<div align = 'center'>
+<img src = 'https://www.teraplot.com/images/isosurface-plot-chm.png' width = '400px'></img><br/>
+<em> $w = x^4 . + y^4 + z^4 - (x^2 + y^2 + z^2 - .4), \hspace{2mm}\text{ Level Set: 0 for Blue}$</em>
+</div>
+<br/>
+
+For $n > 3$, we have isohypes, though visualizing their shape becomes pretty difficult.
+<br/>
+
+## Sparsity of $L_1$, in Gradient Descent
+<br/>
+Let's take a look on how we define $L_1$ regularization for a neural net, onto our minimization function.
+
+$$
+\hat{\phi} = \text{argmin}_{\phi}[\mathcal{L}(\phi, Y) + \lambda ||\phi||_1]
+$$
+
+where $\mathcal{L}$ is our loss and $\lambda||\phi||_1$ represents the penalty term, equivalent to the magnitude, in the $L_1$ metric space, of our parameters $\phi$, multiplied by the regularization hyperparameter $\lambda$.
+<br/>
+If $\mathcal{L}(\phi, Y)$ is $0$, the minimum value of the loss is the $L_1$ norm (or level set) of $\phi$ multiplied by $\lambda$. The set of parameters, $\phi$ can only be minimized to the degree that they yield a minimum of 
+the loss while still meeting the minimum $L_1$ norm.
+<br/>
+
+Via gradient descent, our neural network could try to minimize the value of the $L_1$ norm, but doing so moves the set of $\phi$ into the opposite direction of the minima of the loss.
+<br/>
+<div align = 'center'>
+<img src = 'https://miro.medium.com/v2/resize:fit:1400/1*WHp1RrtEUhMh-aMsd0wajQ.jpeg' width = '350px'></img><br/>
+<em style = {{fontsize:'8px'}}> Countour lines are the loss, the edges of the diamond are the isolines of the $L_1$</em>
+</div>
+<br/>
+As you notice, the minima of the $L_1$ could be simply reduced to $0$ at the origin. But of course, we're also trying to find the minima of the loss, at the center of the black contour lines. 
+<br/>
+Therefore for this problem, our best minima lies on the axis, at the intersection of the contour line of the $L_1$ and the outermost contour line of the loss, at one of the axis...
+<br/>
+...where one of the values of our set of parameters, $\phi$, is $0$.
+<br/>
+
+More generally, regularization via the $L_1$ norm promotes sparsity as the $\text{argmin}_{\phi}$ of $L_1$ regularized loss lies on the direction of a a single axis of the $\mathbb{R}^n$ space given by $\phi$. 
+
+<br/>
+
+This lies on the corners of the diamond, formed by the isolines of the $L_1$.
+<br/>
+<div align = 'center'>
+<img src = 'https://github.com/vxnuaj/Learning-Arc/blob/main/01-neural-networks/03-regularization/img/l1.png?raw=true' width = '250px'></img>
+</div>
+<br/>
+Purely considering $\mathbb{R}^2$, the 
+nearest point to the true minima of the loss on the isolines of the $L_1$ is typically $\in (c, 0), (0, c), (-c, 0), (0, c)$ where $c$ is the level set for $\phi$.
+<br/>
+Then typically, given a $\phi \in \mathbb{R}^2$,
+
+$$
+\text{argmin}_{\phi} \in (c, 0), (0, c), (-c, 0), (0, -c)
+$$
+
+where $c$ is the level set of $||\phi||_1$. Your parameters become **sparse**!
+<br/>
+> Note, typically! 
+> 
+> The construction of your loss function, $\mathcal{L}$, may not always promote sparsity!
+>
+> It's important to take a look at your loss function, when you want sparse $\phi$'s!
+<br/>
+
+In the case of $L_2$ regularization, sparsity tends to not be the case. The isolines of the $L_2$ norm don't yield a diamond but instead compose a circle around the origin.
+<br/>
+<div align = 'center'>
+<img src = 'https://dorianbrown.dev/assets/images/logreg/l2_regularization.png' width = '300px'></img>
+</div>
+<br/>
+
+Then, the minima of the $L_2$ regularized loss doesn't lie on the axis, but instead at an arbitrary point within the subspace of the $L_2$ metric space of $\phi$.
+<br/>
+*Choose your regularizer carefully!*
